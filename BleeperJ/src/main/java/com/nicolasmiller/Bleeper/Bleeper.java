@@ -1,9 +1,12 @@
 package com.nicolasmiller.Bleeper;
 
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.Control;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.Control.Type;
 
 public class Bleeper {
 	public static void main(String[] args) {
@@ -18,16 +21,35 @@ public class Bleeper {
 		try {
 			SourceDataLine line = (SourceDataLine) mixer.getLine(info);
 			AudioSystemUtility.printSourceLineInfo(line);
-			byte[] buffer = new byte[line.getBufferSize()];
-			for(int i = 0; i < buffer.length; i++) {
-				int b = (int) Math.floor(Math.random() * 255) - 128;
-				buffer[i] = (byte) b;
+			if(line.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+				FloatControl masterGain = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+				masterGain.setValue((float) ((masterGain.getMaximum() + masterGain.getMinimum()) / 2.0));
 			}
+			
 			line.open();
 			line.start();
-			while(true) {
-				line.write(buffer, 0, line.getBufferSize());
+			int i = 10;
+			
+			while(i-- > 0) {
+				line.write(WavetableGenerator.noise(line.getBufferSize()), 0, line.getBufferSize());
 			}
+			
+			i = 10;
+			
+			while(i-- > 0) {
+				line.write(WavetableGenerator.lame_sawtooth(line.getBufferSize()), 0, line.getBufferSize());
+			}
+		
+			i = 10;
+			
+			while(i-- > 0) {
+				line.write(WavetableGenerator.lame_rect(line.getBufferSize()), 0, line.getBufferSize());
+			}
+			
+			line.drain();
+			line.stop();
+			line.close();
+			line = null;
 		}
 		catch(Exception e) {
 			throw new RuntimeException(e.getMessage());
