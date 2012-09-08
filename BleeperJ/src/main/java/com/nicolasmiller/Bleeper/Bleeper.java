@@ -28,22 +28,32 @@ public class Bleeper {
 			
 			line.open();
 			line.start();
-			int i = 10;
+			int i = 5;
 			
 			while(i-- > 0) {
 				line.write(WavetableGenerator.noise(line.getBufferSize()), 0, line.getBufferSize());
 			}
 			
-			i = 10;
+			i = 5;
 			
 			while(i-- > 0) {
 				line.write(WavetableGenerator.lame_sawtooth(line.getBufferSize()), 0, line.getBufferSize());
 			}
 		
-			i = 10;
+			i = 5;
 			
 			while(i-- > 0) {
 				line.write(WavetableGenerator.lame_rect(line.getBufferSize()), 0, line.getBufferSize());
+			}
+			
+			
+			int freq = 440;
+			while(freq > 20) {
+				i = 5;
+				while(i-- > 0) {
+					line.write(WavetableGenerator.naive_sine(line.getBufferSize(), freq), 0, line.getBufferSize());
+				}
+				freq /= 2;
 			}
 			
 			line.drain();

@@ -48,4 +48,20 @@ public class WavetableGenerator {
 		}	
 		return buffer;		
 	}
+	
+	public static byte[] naive_sine(int length, int f) {
+		byte[] buffer = new byte[length];
+		for(int i = 0; i < buffer.length; i += 4) {
+			double t = (buffer.length / 44100.0) * ((double) i / buffer.length);
+			double sample = Short.MAX_VALUE * Math.sin(2 * Math.PI * f * t);
+			int val = (int) sample;
+			int little = val & 0x0F;
+			int big = val >> 8;
+			buffer[i] = (byte) little; 
+			buffer[i + 1] = (byte) big; 
+			buffer[i + 2] = (byte) little; 
+			buffer[i + 3] = (byte) big;
+		}
+		return buffer;
+	}
 }
